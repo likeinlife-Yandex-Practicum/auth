@@ -4,7 +4,9 @@ from fastapi import APIRouter, Depends, Request, Response
 
 from auth_app.api.pagination import Pagination
 from auth_app.api.role_check import get_current_user
+from auth_app.models.domain.user import User
 from auth_app.models.dto import LoginRecordSchema, UserSignInSchema, UserSignUpSchema
+from auth_app.models.dto.user import UserInfoSchema
 from auth_app.services.auth_service import AuthService, get_auth_service
 
 router = APIRouter()
@@ -118,3 +120,17 @@ async def get_login_history(
     )
 
     return [LoginRecordSchema(**record.dict()) for record in records]
+
+
+@router.get(
+    "/me/",
+    status_code=HTTPStatus.OK,
+    tags=["auth"],
+    description="Получить информацию о себе",
+    dependencies=[Depends(get_current_user)],
+    response_model=UserInfoSchema,
+)
+async def me(
+    user: User = Depends(get_current_user),
+) -> UserInfoSchema:
+    return UserInfoSchema(**user.dict())
