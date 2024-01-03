@@ -41,8 +41,8 @@ app = FastAPI(
     title="Auth сервис",
     description="Сервис авторизации, аутентификации",
     version="0.0.1",
-    docs_url="/auth/api/openapi",
-    openapi_url="/auth/api/openapi.json",
+    docs_url="/api/openapi",
+    openapi_url="/api/openapi.json",
     default_response_class=ORJSONResponse,
     lifespan=lifespan,
     dependencies=[Depends(RateLimiter(times=s.request_limit_per_minute, minutes=1))],
@@ -86,9 +86,9 @@ if not s.debug:
 
     FastAPIInstrumentor.instrument_app(app)
 
-app.include_router(healthcheck.router, prefix="/auth")
-app.include_router(auth.router, prefix="/auth/api/v1/auth")
-app.include_router(user.router, prefix="/auth/api/v1/user")
-app.include_router(role.router, prefix="/auth/api/v1/role")
-app.include_router(user_role.router, prefix="/auth/api/v1/role")
-app.include_router(oauth.router, prefix="/auth/api/v1/oauth")
+app.include_router(healthcheck.router)
+app.include_router(auth.router, prefix="/api/v1/auth")
+app.include_router(user.router, prefix="/api/v1/user")
+app.include_router(role.router, prefix="/api/v1/role")
+app.include_router(user_role.router, prefix="/api/v1/role")
+app.include_router(oauth.router, prefix="/api/v1/oauth")

@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   api:
     build: src
@@ -13,11 +13,16 @@ services:
       - AUTH_POSTGRES_PORT=5432
       - AUTH_REDIS_HOST=redis
       - AUTH_REDIS_PORT=6379
+      - AUTH_RSA_PRIVATE_PATH=/run/secrets/rsa_priv
+      - AUTH_RSA_PUBLIC_PATH=/run/secrets/rsa_pub
     depends_on:
       - postgres
       - redis
     volumes:
       - ./src:/opt/app
+    secrets:
+      - rsa_pub
+      - rsa_priv
     ports:
       - "8000:80"
 
@@ -69,8 +74,14 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     ports:
-      - '5432:5432'
+      - "5432:5432"
 
 volumes:
   postgres-data:
   elastic-data:
+
+secrets:
+  rsa_pub:
+    file: ./keys/rsa.pub
+  rsa_priv:
+    file: ./keys/rsa.private
