@@ -13,7 +13,7 @@ services:
   auth-test:
     build: ../src
     healthcheck:
-      test: curl -f 127.0.0.1/auth/health || exit 1
+      test: curl -f 127.0.0.1/health || exit 1
       interval: 3s
       timeout: 30s
     restart: always
