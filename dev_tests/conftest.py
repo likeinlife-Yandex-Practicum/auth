@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 import pytest
-
 from auth_app.services.jwt_service import JWTService
 
 from .misc import get_rsa

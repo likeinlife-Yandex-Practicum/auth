@@ -2,9 +2,9 @@ import time
 import uuid
 from datetime import timedelta
 
-import jwt
 import pytest
-
+from auth_app.errors.services import InvalidTokenError
+from auth_app.errors.services.main import ExpiredJwtError
 from auth_app.services.jwt_service import JWTService
 
 
@@ -21,7 +21,7 @@ def test_invalid_token(get_jwt_service):
     user_id = str(uuid.uuid4())
     token = jwt_service.encode_access_token(user_id, "email@mail.ru", ["sample"])
 
-    with pytest.raises(jwt.InvalidTokenError):
+    with pytest.raises(InvalidTokenError):
         jwt_service.decode_access_token(token + "1")
 
 
@@ -32,7 +32,7 @@ def test_expired_token(get_jwt_service):
 
     time.sleep(1)
 
-    with pytest.raises(jwt.ExpiredSignatureError):
+    with pytest.raises(ExpiredJwtError):
         jwt_service.decode_access_token(token)
 
 
@@ -53,5 +53,5 @@ def test_expired_refresh_token(get_jwt_service):
 
     time.sleep(1)
 
-    with pytest.raises(jwt.ExpiredSignatureError):
+    with pytest.raises(ExpiredJwtError):
         jwt_service.refresh_token(refresh_token)
