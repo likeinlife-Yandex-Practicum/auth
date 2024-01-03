@@ -1,0 +1,40 @@
+version: '3'
+services:
+  auth-service:
+    build: src
+    restart: always
+    command: uvicorn auth_app.main:app --host 0.0.0.0 --port 80 --reload
+    env_file:
+      - .env
+    depends_on:
+      - auth-postgres
+      - auth-redis
+    volumes:
+      - ./src:/opt/app
+    ports:
+      - "8000:80"
+
+  auth-redis:
+    image: redis:latest
+    restart: always
+    healthcheck:
+      test: redis-cli ping || exit 1
+      interval: 10s
+      timeout: 30s
+      retries: 10
+    ports:
+      - "6379:6379"
+
+  auth-postgres:
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_DB=${AUTH_POSTGRES_DB}
+      - POSTGRES_USER=${AUTH_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${AUTH_POSTGRES_PASSWORD}
+    volumes:
+      - auth-postgres:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+volumes:
+  auth-postgres:
