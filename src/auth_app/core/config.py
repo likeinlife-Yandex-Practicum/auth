@@ -62,6 +62,7 @@ class OAuthSettings(BaseSettings):
 
 class Settings(BaseSettings):
     project_name: str = Field()
+    project_root_url: str = Field("")
     jaeger = JaegerSettings()
     redis = RedisSettings()
     db = PostgresSettings()

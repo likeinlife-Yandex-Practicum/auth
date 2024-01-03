@@ -46,6 +46,7 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
     lifespan=lifespan,
     dependencies=[Depends(RateLimiter(times=s.request_limit_per_minute, minutes=1))],
+    root_path=s.project_root_url,
 )
 
 
