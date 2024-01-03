@@ -1,13 +1,16 @@
 # Запуск 
 up:
-	docker compose -f docker-compose-dev.yaml up -d --build
+	docker compose up -d --build
+
+env:
+	cp sample.env .env
 
 # Остановка
 downv:
-	docker compose -f docker-compose-dev.yaml down -v
+	docker compose down -v
 
 down:
-	docker compose -f docker-compose-dev.yaml down
+	docker compose down
 
 # Тестирование
 test:
@@ -18,12 +21,12 @@ down-test:
 
 # Миграции 
 makerevision:
-	docker compose -f docker-compose-dev.yaml exec auth-service alembic -c /opt/app/alembic.ini revision --autogenerate -m $(NAME)
+	docker compose exec api alembic -c /opt/app/alembic.ini revision --autogenerate -m $(NAME)
 
 migrate:
-	docker compose -f docker-compose-dev.yaml exec auth-service alembic -c /opt/app/alembic.ini upgrade head
+	docker compose exec api alembic -c /opt/app/alembic.ini upgrade head
 
 # CLI
 create-admin:
-	docker compose -f docker-compose-dev.yaml exec auth-service python -m cli admin create $(email) $(password)
+	docker compose exec api python -m cli admin create $(email) $(password)
 

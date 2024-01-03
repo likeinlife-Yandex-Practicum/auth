@@ -1,0 +1,76 @@
+version: '3'
+services:
+  api:
+    build: src
+    restart: always
+    command: uvicorn auth_app.main:app --host 0.0.0.0 --port 80 --reload
+    env_file:
+      - .env
+    environment:
+      - AUTH_JAEGER_HOST=jaeger
+      - AUTH_JAEGER_PORT=6831
+      - AUTH_POSTGRES_HOST=postgres
+      - AUTH_POSTGRES_PORT=5432
+      - AUTH_REDIS_HOST=redis
+      - AUTH_REDIS_PORT=6379
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./src:/opt/app
+    ports:
+      - "8000:80"
+
+  elasticsearch:
+    image: elasticsearch:7.17.14
+    healthcheck:
+      test: "curl -f 127.0.0.1:9200 || exit 1"
+      interval: 10s
+      timeout: 30s
+    environment:
+      - "discovery.type=single-node"
+      - "xpack.security.enabled=false"
+      - "ES_JAVA_OPTS=-Xms200m -Xmx200m"
+    volumes:
+      - elastic-data:/usr/share/elasticsearch/data
+    expose:
+      - 9200
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    restart: on-failure
+    environment:
+      SPAN_STORAGE_TYPE: elasticsearch
+      ES_SERVER_URLS: "http://${ELASTIC_SEARCH_HOST}:${ELASTIC_SEARCH_PORT}"
+    depends_on:
+      - elasticsearch
+      - api
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"
+
+  redis:
+    image: redis:latest
+    restart: always
+    healthcheck:
+      test: redis-cli ping || exit 1
+      interval: 10s
+      timeout: 30s
+      retries: 10
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_DB=${AUTH_POSTGRES_DB}
+      - POSTGRES_USER=${AUTH_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${AUTH_POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+volumes:
+  postgres-data:
+  elastic-data:

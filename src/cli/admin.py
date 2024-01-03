@@ -5,7 +5,7 @@ import logging
 
 import typer
 from auth_app.db.sqlalchemy import get_async_session
-from auth_app.external.errors import RoleAlreadyExists
+from auth_app.errors.external import RoleAlreadyExists
 from auth_app.external.role_repository import RoleRepository
 from auth_app.external.user_repository import UserRepository
 from auth_app.external.user_role_repository import UserRoleRepository
