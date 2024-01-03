@@ -66,8 +66,13 @@ class Settings(BaseSettings):
     redis = RedisSettings()
     db = PostgresSettings()
     oauth = OAuthSettings()
-    database_dsn: PostgresDsn = f"postgresql+asyncpg://{db.user}:{db.password}@{db.host}:{db.port}/{db.db}"
-
+    database_dsn: PostgresDsn = PostgresDsn.build(
+        scheme="postgresql+asyncpg",
+        user=db.user,
+        password=db.password,
+        host=db.host,
+        port=str(db.port),
+    )
     rsa_public_path: Path = Field()
     rsa_private_path: Path = Field()
 
@@ -75,8 +80,8 @@ class Settings(BaseSettings):
     console_logging_level: str = Field("DEBUG")
     debug_mode: bool = Field(False)
 
-    access_token_lifetime: timedelta = Field("P0DT12H00M0S")
-    refresh_token_lifetime: timedelta = Field("P15DT12H00M0S")
+    access_token_lifetime: timedelta = Field(timedelta(hours=6))
+    refresh_token_lifetime: timedelta = Field(timedelta(hours=6))
 
     request_limit_per_minute: int = Field(60)
 
