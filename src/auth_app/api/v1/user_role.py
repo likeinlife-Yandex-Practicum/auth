@@ -38,7 +38,7 @@ async def get_user_roles(
     status_code=HTTPStatus.OK,
     tags=["Роль"],
     description="Получение списка пользователей по роли",
-    response_model=list[RoleInfoSchema],
+    response_model=list[UserInfoSchema],
 )
 async def get_user_by_role_name(
     role_name: str = Path(description="Slug роли"),
@@ -46,9 +46,9 @@ async def get_user_by_role_name(
     user_role_service: UserRoleService = Depends(get_user_role_service),
 ) -> list[UserInfoSchema]:
     result = await user_role_service.get_users_by_role(
-        role_name,
-        pagination.limit,
-        pagination.offset,
+        role_name=role_name,
+        limit=pagination.limit,
+        offset=pagination.offset,
     )
     return [UserInfoSchema(**user.dict()) for user in result]
 
